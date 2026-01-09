@@ -1,124 +1,218 @@
-# 🍳 Notion CMS 레시피 카탈로그
+# 레시피 카탈로그 (Recipe Catalog)
 
-Notion을 CMS로 활용하여 레시피 데이터를 관리하고, 웹에서 실시간으로 조회 및 필터링할 수 있는 동적 레시피 플랫폼입니다.
+Notion을 CMS로 활용한 레시피 카탈로그 웹 애플리케이션입니다. Next.js 16, TypeScript, Tailwind CSS 4로 구축되었으며, Notion API를 통해 실시간으로 레시피 데이터를 조회합니다.
 
-## 🎯 프로젝트 개요
+## 주요 기능
 
-- **프로젝트명:** 레시피 카탈로그 (Recipe Catalog)
-- **목적:** Notion API 기반 CMS로 레시피 데이터 중앙 집중식 관리 및 동적 웹 플랫폼 제공
-- **CMS 선택 이유:** 비개발자도 Notion에서 직접 콘텐츠 관리 가능, 별도 백엔드 DB 불필요, 빠른 프로토타이핑
+- **Notion API 연동**: Notion 데이터베이스에서 실시간으로 레시피 조회
+- **필터 및 검색**: 카테고리, 조리시간, 제목 기반 필터링
+- **반응형 그리드**: 모바일, 태블릿, 데스크톱 대응
+- **레시피 상세 페이지**: 재료, 조리법 등 상세 정보 표시
+- **다크모드**: 라이트/다크 테마 전환 지원
+- **타입 안전성**: TypeScript strict 모드 + Zod 검증
 
-## 🎨 주요 기능
+## 기술 스택
 
-- **Notion API 기반 동적 조회:** 실시간 레시피 데이터 조회 및 캐싱 (ISR)
-- **반응형 레이아웃:** 모바일 1열, 태블릿 2열, 데스크톱 4열의 그리드 레이아웃
-- **검색 및 필터:** 카테고리, 조리시간, 제목 기반 실시간 검색
-- **상세 페이지:** 동적 라우트로 이미지, 재료, 조리법 단계별 표시
-- **공유 기능:** 클립보드 복사, 링크 공유 기능
+| 계층         | 기술                        |
+| ------------ | --------------------------- |
+| **Frontend** | Next.js 16.1.1 (App Router) |
+| **언어**     | TypeScript (strict 모드)    |
+| **스타일링** | Tailwind CSS 4 + shadcn/ui  |
+| **아이콘**   | Lucide React                |
+| **검증**     | Zod                         |
+| **CMS**      | Notion API                  |
+| **API 통신** | fetch (내장)                |
 
-## 🛠 기술 스택
+## 설치 및 실행
 
-| 계층                 | 기술                               |
-| -------------------- | ---------------------------------- |
-| **Framework**        | Next.js 16.1.1 (App Router)        |
-| **Language**         | TypeScript 5 (strict mode)         |
-| **Styling**          | Tailwind CSS 4 + shadcn/ui         |
-| **Forms**            | React Hook Form 7.70.0 + Zod 4.3.5 |
-| **State Management** | Zustand 5.0.9                      |
-| **Icons**            | Lucide React 0.562.0               |
-| **CMS**              | Notion API                         |
-| **Other**            | date-fns, next-themes, usehooks-ts |
-
-## 🚀 빠른 시작
-
-### 전제 조건
-
-- Node.js 18 이상
-- npm 또는 yarn
-
-### 설치 및 실행
+### 1. 프로젝트 클론
 
 ```bash
-# 의존성 설치
+git clone [repository-url]
+cd notion-cms-recipe
+```
+
+### 2. 의존성 설치
+
+```bash
 npm install
-
-# 개발 서버 실행 (localhost:3000)
-npm run dev
-
-# 프로덕션 빌드
-npm run build
-
-# 프로덕션 서버 실행
-npm run start
-
-# Lint 검사
-npm run lint
 ```
 
-## 📁 프로젝트 구조
+### 3. Notion 설정
+
+#### 3.1 Notion Integration 생성
+
+1. [Notion Integrations](https://www.notion.so/my-integrations) 접속
+2. "New integration" 클릭
+3. Integration 이름 입력 (예: "Recipe Catalog")
+4. Internal Integration Token 복사
+
+#### 3.2 Notion 데이터베이스 생성
+
+다음 속성으로 데이터베이스를 생성하세요:
+
+| 필드명           | 타입          | 설명                                    |
+| ---------------- | ------------- | --------------------------------------- |
+| **Title**        | Title         | 레시피 제목                             |
+| **Category**     | Select        | 카테고리 (한식, 양식, 중식, 일식, 기타) |
+| **CookingTime**  | Number        | 조리시간 (분)                           |
+| **Difficulty**   | Select        | 난이도 (초급, 중급, 상급)               |
+| **Ingredients**  | Rich Text     | 재료 목록                               |
+| **Instructions** | Rich Text     | 조리 방법                               |
+| **Image**        | Files & media | 레시피 이미지                           |
+| **Servings**     | Number        | 인분                                    |
+| **Published**    | Checkbox      | 공개 여부                               |
+
+#### 3.3 데이터베이스에 Integration 연결
+
+1. 생성한 데이터베이스 페이지 열기
+2. 우측 상단 "..." 메뉴 클릭
+3. "Add connections" 선택
+4. 생성한 Integration 선택
+
+#### 3.4 데이터베이스 ID 확인
+
+데이터베이스 URL에서 ID 추출:
 
 ```
-app/                              # Next.js App Router
-├── page.tsx                       # 메인 페이지 (레시피 카탈로그)
-├── recipes/
-│   └── [id]/
-│       └── page.tsx              # 레시피 상세 페이지
-├── api/
-│   └── recipes.ts                # Notion API 통합
-└── layout.tsx                    # 루트 레이아웃
-
-components/
-├── ui/                           # shadcn/ui 컴포넌트
-├── layout/                       # Header, Footer
-└── recipes/                      # 레시피 관련 컴포넌트
-    ├── recipe-card.tsx
-    ├── recipe-grid.tsx
-    ├── filter-section.tsx
-    └── recipe-detail.tsx
-
-lib/
-├── utils.ts                      # cn() - 클래스명 병합
-├── validations.ts                # Zod 검증 스키마
-└── constants.ts                  # 상수
-
-types/
-└── index.ts                      # Recipe, Filter 타입
-
-store/
-└── use-recipe-store.ts           # Zustand 필터 상태
-
-.claude/                          # Claude Code 설정
-├── agents/
-├── commands/
-├── hooks/
-└── settings.local.json
+https://www.notion.so/[workspace]/[database_id]?v=...
+                                  ^^^^^^^^^^^^^^^^
+                                  이 부분이 Database ID
 ```
 
-## 📊 Notion 데이터베이스 구조
+### 4. 환경변수 설정
 
-| 필드명           | 타입          | 설명               |
-| ---------------- | ------------- | ------------------ |
-| **Title**        | Title         | 레시피 제목 (필수) |
-| **Category**     | Select        | 요리 카테고리      |
-| **CookingTime**  | Number        | 조리시간 (분)      |
-| **Difficulty**   | Select        | 난이도             |
-| **Ingredients**  | Rich Text     | 재료 목록          |
-| **Instructions** | Rich Text     | 조리 방법          |
-| **Image**        | Files & media | 요리 이미지        |
-| **Servings**     | Number        | 인분               |
-| **Published**    | Checkbox      | 공개 여부          |
-
-## 📋 환경 변수 설정
-
-`.env.local` 파일을 생성하고 다음을 추가하세요:
+`.env.local.example` 파일을 복사하여 `.env.local` 생성:
 
 ```bash
-# Notion API
-NEXT_PUBLIC_NOTION_DATABASE_ID=your_database_id
-NOTION_API_KEY=your_api_key
+cp .env.local.example .env.local
 ```
 
-## 🎯 개발 가이드
+`.env.local` 파일 수정:
+
+```env
+NOTION_API_KEY=secret_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+NOTION_DATABASE_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+### 5. 개발 서버 실행
+
+```bash
+npm run dev
+```
+
+http://localhost:3000 에서 확인
+
+### 6. 프로덕션 빌드
+
+```bash
+npm run build
+npm run start
+```
+
+## 프로젝트 구조
+
+```
+notion-cms-recipe/
+├── app/
+│   ├── api/
+│   │   └── recipes/
+│   │       └── route.ts          # Notion API 엔드포인트
+│   ├── recipes/
+│   │   └── [id]/
+│   │       └── page.tsx          # 레시피 상세 페이지
+│   ├── layout.tsx                # 루트 레이아웃
+│   └── page.tsx                  # 메인 페이지
+├── components/
+│   ├── ui/                       # shadcn/ui 컴포넌트
+│   ├── layout/                   # Header, Footer
+│   ├── recipe-card.tsx           # 레시피 카드 컴포넌트
+│   └── filter-section.tsx        # 필터 섹션 컴포넌트
+├── lib/
+│   ├── notion.ts                 # Notion API 유틸리티
+│   ├── validations.ts            # Zod 검증 스키마
+│   └── utils.ts                  # 유틸리티 함수
+├── types/
+│   └── index.ts                  # TypeScript 타입 정의
+└── .env.local.example            # 환경변수 템플릿
+```
+
+## API 엔드포인트
+
+### GET /api/recipes
+
+레시피 목록 조회 (필터 적용 가능)
+
+**쿼리 파라미터:**
+
+- `category`: 카테고리 필터 (한식, 양식, 중식, 일식, 기타)
+- `cookingTime`: 조리시간 필터 (분 단위, 이하 조건)
+- `search`: 제목 검색
+
+**응답 예시:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "xxx",
+      "title": "계란말이",
+      "category": "한식",
+      "cookingTime": 15,
+      "difficulty": "초급",
+      "ingredients": "계란 3개, 설탕 1큰술...",
+      "instructions": "1. 계란을 풀어준다...",
+      "image": "https://...",
+      "servings": 2,
+      "published": true,
+      "createdAt": "2025-01-09T..."
+    }
+  ],
+  "count": 1
+}
+```
+
+## 주요 컴포넌트
+
+### RecipeCard
+
+레시피 카드 UI 컴포넌트
+
+- 이미지, 제목, 카테고리, 난이도, 조리시간, 인분 표시
+- 호버 애니메이션
+- 상세 페이지 링크 연결
+
+### FilterSection
+
+필터 UI 컴포넌트
+
+- 카테고리 드롭다운
+- 조리시간 드롭다운
+- 제목 검색 입력
+- 필터 초기화 버튼
+
+## 타입 정의
+
+### Recipe
+
+```typescript
+interface Recipe {
+  id: string;
+  title: string;
+  category: string;
+  cookingTime: number;
+  difficulty: string;
+  ingredients: string;
+  instructions: string;
+  image: string | null;
+  servings: number;
+  published: boolean;
+  createdAt: string;
+}
+```
+
+## 개발 가이드
 
 ### 코딩 규칙
 
@@ -129,50 +223,35 @@ NOTION_API_KEY=your_api_key
 - **에러 처리:** `error: unknown` + 타입 가드 필수
 - **주석/문서:** 한국어로 작성
 
-### 타입 안전성
+### 새 레시피 추가
 
-```typescript
-// ✅ 올바른 에러 처리
-try {
-  // ...
-} catch (error: unknown) {
-  const message = error instanceof Error ? error.message : "알 수 없는 오류";
-}
+1. Notion 데이터베이스에서 새 페이지 생성
+2. 모든 필드 입력
+3. `Published` 체크박스 활성화
+4. 웹에서 자동으로 표시됨
 
-// ❌ 금지
-try {
-  // ...
-} catch (error: any) {
-  // error의 타입이 불명확함
-}
-```
+### 필터 카테고리 추가
 
-### 폼 + 검증
+1. `components/filter-section.tsx`에서 카테고리 옵션 추가
+2. Notion 데이터베이스의 `Category` 속성에 동일한 옵션 추가
 
-```typescript
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { contactFormSchema } from "@/lib/validations";
+## 배포
 
-export function MyForm() {
-  const form = useForm({
-    resolver: zodResolver(contactFormSchema),
-    defaultValues: { /* ... */ }
-  });
+### Vercel 배포 (권장)
 
-  return (
-    <form onSubmit={form.handleSubmit(onSubmit)}>
-      {/* 폼 필드 */}
-    </form>
-  );
-}
-```
+1. GitHub에 코드 푸시
+2. [Vercel](https://vercel.com) 접속
+3. "New Project" 클릭
+4. GitHub 레포지토리 선택
+5. 환경변수 설정:
+   - `NOTION_API_KEY`
+   - `NOTION_DATABASE_ID`
+6. 배포 완료
 
-## 📚 참고 자료
+## 라이선스
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Notion API Reference](https://developers.notion.com)
-- [Tailwind CSS](https://tailwindcss.com)
-- [shadcn/ui](https://ui.shadcn.com)
-- [React Hook Form](https://react-hook-form.com)
-- [Zod Documentation](https://zod.dev)
+MIT License
+
+## 문의
+
+프로젝트 관련 문의사항은 이슈를 등록해주세요.
